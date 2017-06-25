@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<BorderPane fx:id="contentPane" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <center>
+      <GridPane fx:id="sudokuGrid" alignment="center">
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+         </rowConstraints>
+         <columnConstraints>
+            <ColumnConstraints minWidth="10.0" prefWidth="30.0" />
+            <ColumnConstraints minWidth="10.0" prefWidth="30.0" />
+            <ColumnConstraints minWidth="10.0" prefWidth="30.0" />
+            <ColumnConstraints minWidth="10.0" prefWidth="30.0" />
+            <ColumnConstraints minWidth="10.0" prefWidth="30.0" />
+            <ColumnConstraints minWidth="10.0" prefWidth="30.0" />
+            <ColumnConstraints minWidth="10.0" prefWidth="30.0" />
+            <ColumnConstraints minWidth="10.0" prefWidth="30.0" />
+            <ColumnConstraints minWidth="10.0" prefWidth="30.0" />
+         </columnConstraints>
+      </GridPane>
+   </center>
+   <bottom>
+      <HBox maxWidth="270.0" prefWidth="270.0" spacing="7.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button id="newButton" fx:id="newButton" accessibleHelp="Play" mnemonicParsing="false" styleClass="iconButton" stylesheets="@styles.css" />
+            <Button id="restartButton" fx:id="restartButton" accessibleHelp="Restart" mnemonicParsing="false" styleClass="iconButton" stylesheets="@styles.css" />
+            <Button id="editButton" fx:id="editButton" accessibleHelp="Edit" mnemonicParsing="false" onAction="#showEditMenu" styleClass="iconButton" stylesheets="@styles.css" />
+            <Button id="solveButton" fx:id="solveButton" accessibleHelp="Solve" mnemonicParsing="false" styleClass="iconButton" stylesheets="@styles.css" />
+            <Button id="loadButton" fx:id="loadButton" accessibleHelp="Load" mnemonicParsing="false" onAction="#showLoadMenu" styleClass="iconButton" stylesheets="@styles.css" />
+            <Button id="saveButton" fx:id="saveButton" accessibleHelp="Save" mnemonicParsing="false" onAction="#saveGame" styleClass="iconButton" stylesheets="@styles.css" />
+         </children>
+         <padding>
+            <Insets bottom="7.0" left="7.0" right="7.0" top="7.0" />
+         </padding>
+      </HBox>
+   </bottom>
+</BorderPane>

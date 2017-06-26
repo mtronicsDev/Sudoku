@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane fx:id="contentPane" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<BorderPane fx:id="contentPane" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.gruppe3.sudoku.Controller">
    <center>
       <GridPane fx:id="sudokuGrid" alignment="center">
          <rowConstraints>
@@ -41,7 +41,7 @@
             <Button id="newButton" fx:id="newButton" accessibleHelp="Play" mnemonicParsing="false" styleClass="iconButton" stylesheets="@styles.css" />
             <Button id="restartButton" fx:id="restartButton" accessibleHelp="Restart" mnemonicParsing="false" styleClass="iconButton" stylesheets="@styles.css" />
             <Button id="editButton" fx:id="editButton" accessibleHelp="Edit" mnemonicParsing="false" onAction="#showEditMenu" styleClass="iconButton" stylesheets="@styles.css" />
-            <Button id="solveButton" fx:id="solveButton" accessibleHelp="Solve" mnemonicParsing="false" styleClass="iconButton" stylesheets="@styles.css" />
+            <Button id="solveButton" fx:id="solveButton" accessibleHelp="Solve" mnemonicParsing="false" onAction="#solveSudoku" styleClass="iconButton" stylesheets="@styles.css" />
             <Button id="loadButton" fx:id="loadButton" accessibleHelp="Load" mnemonicParsing="false" onAction="#showLoadMenu" styleClass="iconButton" stylesheets="@styles.css" />
             <Button id="saveButton" fx:id="saveButton" accessibleHelp="Save" mnemonicParsing="false" onAction="#saveGame" styleClass="iconButton" stylesheets="@styles.css" />
          </children>

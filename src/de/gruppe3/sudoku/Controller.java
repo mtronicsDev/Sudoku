@@ -1,4 +1,4 @@
-package sample;
+package de.gruppe3.sudoku;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -31,6 +31,8 @@ public class Controller {
     static final String EDIT_BG_COLOR = "Edit Background";
     static final String EDIT_FG_COLOR = "Edit Foreground";
 
+    static final Color WRONG_FIELD_COLOR = new Color(0.8902, 0.451, 0.4431, 1);
+
     boolean menuOpen = false;
     int difficulty = 3;
 
@@ -61,12 +63,16 @@ public class Controller {
     ColorPicker bgColorPicker;
     ColorPicker numColorPicker;
 
+    Color bgColor = Color.WHEAT;
+    Color fgColor = Color.BLACK;
+
     Slider difficultySlider;
 
     @FXML
     BorderPane contentPane;
 
     TextField[][] sudokuSquares;
+    private boolean setup = true;
 
     @FXML
     public void initialize() {
@@ -78,12 +84,25 @@ public class Controller {
                 sudokuSquares[x][y] = sudokuSquare;
 
                 sudokuSquare.textProperty().addListener((o, oldVal, newVal) -> {
+                    sudokuSquare.setStyle(sudokuSquare.getStyle().concat(String.format("-fx-background-color: rgb(%d, %d, %d);",
+                            (int)(bgColor.getRed()*255), (int)(bgColor.getGreen()*255), (int)(bgColor.getBlue()*255))));
+
                     if (newVal.length() > 1) {
                         newVal = newVal.substring(0, 1);
                         sudokuSquare.setText(newVal);
                     }
 
-                    if (!newVal.matches("[0-9]")) sudokuSquare.setText("");
+                    if (!newVal.matches("[1-9]")) sudokuSquare.setText("");
+                    else {
+                        boolean solvable = isSettingUp() || checkSudoku() != null;
+
+                        if (!solvable) {
+                            sudokuSquare.setStyle(sudokuSquare.getStyle().concat(String.format("-fx-background-color: rgb(%d, %d, %d);",
+                                    (int)(WRONG_FIELD_COLOR.getRed()*255),
+                                    (int)(WRONG_FIELD_COLOR.getGreen()*255),
+                                    (int)(WRONG_FIELD_COLOR.getBlue()*255))));
+                        }
+                    }
                 });
 
                 sudokuSquare.getStyleClass().add("sudokuSquare");
@@ -118,7 +137,7 @@ public class Controller {
 
         bgColorPicker = new ColorPicker(Color.WHITE);
         bgColorPicker.setOnAction(e -> {
-            Color bgColor = bgColorPicker.getValue();
+            bgColor = bgColorPicker.getValue();
 
             for (TextField[] line : sudokuSquares) {
                 for (TextField square : line) {
@@ -133,13 +152,13 @@ public class Controller {
 
         numColorPicker = new ColorPicker(Color.BLACK);
         numColorPicker.setOnAction(e -> {
-            Color bgColor = numColorPicker.getValue();
+            fgColor = numColorPicker.getValue();
 
             for (TextField[] line : sudokuSquares) {
                 for (TextField square : line) {
                     square.setStyle(square.getStyle().concat(String.format("-fx-text-fill: rgb(%d, %d, %d); -fx-border-color: rgb(%d, %d, %d);",
-                            (int)(bgColor.getRed()*255), (int)(bgColor.getGreen()*255), (int)(bgColor.getBlue()*255),
-                            (int)(bgColor.getRed()*255), (int)(bgColor.getGreen()*255), (int)(bgColor.getBlue()*255))));
+                            (int)(fgColor.getRed()*255), (int)(fgColor.getGreen()*255), (int)(fgColor.getBlue()*255),
+                            (int)(fgColor.getRed()*255), (int)(fgColor.getGreen()*255), (int)(fgColor.getBlue()*255))));
                 }
             }
 
@@ -180,6 +199,8 @@ public class Controller {
 
         loadMenu = new ListView<>();
         loadMenu.setOnMouseClicked(e -> loadGame(loadMenu.getSelectionModel().getSelectedItem()));
+
+        setup = false;
     }
 
     public void postInitialize() {
@@ -192,6 +213,10 @@ public class Controller {
         s.getAccelerators().put(new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN), () -> solveButton.fire());
         s.getAccelerators().put(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), () -> newButton.fire());
         s.getAccelerators().put(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN), () -> ((Stage) s.getWindow()).close());
+    }
+
+    private boolean isSettingUp() {
+        return setup;
     }
 
     private void showDifficultyMenu() {
@@ -240,7 +265,44 @@ public class Controller {
         contentPane.setCenter(loadMenu);
     }
 
+    @FXML
+    public void solveSudoku() {
+        byte[][] solution = checkSudoku();
+
+        if (solution == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText("Sudoku is unsolvable!");
+            alert.setContentText("The sudoku has either no or too many possible solutions!");
+            alert.showAndWait();
+        } else {
+            for (int x = 0; x < 9; x++) {
+                for (int y = 0; y < 9; y++) {
+                    sudokuSquares[x][y].setText(String.valueOf(solution[x][y]));
+                }
+            }
+        }
+    }
+
+    private byte[][] checkSudoku() {
+        byte[][] values = new byte[9][9];
+
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 9; y++) {
+                String text = sudokuSquares[x][y].getText();
+                if (text.equals("")) values[x][y] = 0;
+                else values[x][y] = Byte.valueOf(text);
+            }
+        }
+
+        Solver.solve(values);
+
+        if (values[0][0] == -1) return null;
+        return values;
+    }
+
     public void loadGame(ImageView selectedItem) {
+        setup = true;
+
         String csvName = "saves/" + selectedItem.getId() + ".csv";
 
         List<String> csvLines = new ArrayList<>(9);
@@ -259,14 +321,15 @@ public class Controller {
         }
 
         for (int line = 0; line < 9; line++) {
-            String[] fields = csvLines.get(line).split(", ");
+            String[] fields = csvLines.get(line).split("[ ]*,[ ]*");
 
             for (int column = 0; column < 9; column++) {
-                sudokuSquares[line][column].setText(fields[column]);
-                if(!fields[column].equals("")) sudokuSquares[line][column].getStyleClass().add("givenNumber");
+                sudokuSquares[column][line].setText(fields[column]);
+                if(!fields[column].equals("0")) sudokuSquares[column][line].getStyleClass().add("givenNumber");
             }
         }
 
+        setup = false;
         contentPane.setCenter(sudokuGrid);
     }
 
@@ -275,7 +338,8 @@ public class Controller {
         StringBuilder csvBuilder = new StringBuilder();
         for (int y = 0; y < 9; y++) {
             for (int x = 0; x < 9; x++) {
-                csvBuilder.append(sudokuSquares[x][y].getText());
+                if (!sudokuSquares[x][y].getText().equals(""))csvBuilder.append(sudokuSquares[x][y].getText());
+                else csvBuilder.append("0");
 
                 if (x != 8)
                     csvBuilder.append(", ");

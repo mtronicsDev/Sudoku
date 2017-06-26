@@ -37,17 +37,21 @@
    </center>
    <bottom>
       <HBox maxWidth="270.0" prefWidth="270.0" spacing="7.0" BorderPane.alignment="CENTER">
-         <children>
-            <Button id="newButton" fx:id="newButton" accessibleHelp="Play" mnemonicParsing="false" styleClass="iconButton" stylesheets="@styles.css" />
-            <Button id="restartButton" fx:id="restartButton" accessibleHelp="Restart" mnemonicParsing="false" styleClass="iconButton" stylesheets="@styles.css" />
-            <Button id="editButton" fx:id="editButton" accessibleHelp="Edit" mnemonicParsing="false" onAction="#showEditMenu" styleClass="iconButton" stylesheets="@styles.css" />
-            <Button id="solveButton" fx:id="solveButton" accessibleHelp="Solve" mnemonicParsing="false" onAction="#solveSudoku" styleClass="iconButton" stylesheets="@styles.css" />
-            <Button id="loadButton" fx:id="loadButton" accessibleHelp="Load" mnemonicParsing="false" onAction="#showLoadMenu" styleClass="iconButton" stylesheets="@styles.css" />
-            <Button id="saveButton" fx:id="saveButton" accessibleHelp="Save" mnemonicParsing="false" onAction="#saveGame" styleClass="iconButton" stylesheets="@styles.css" />
-         </children>
          <padding>
-            <Insets bottom="7.0" left="7.0" right="7.0" top="7.0" />
+            <Insets bottom="7.0" left="7.0" right="7.0" top="7.0"/>
          </padding>
+         <Button id="newButton" fx:id="newButton" accessibleHelp="Play" mnemonicParsing="false" styleClass="iconButton"
+                 stylesheets="@styles.css"/>
+         <Button id="restartButton" fx:id="restartButton" accessibleHelp="Restart" mnemonicParsing="false"
+                 styleClass="iconButton" stylesheets="@styles.css"/>
+         <Button id="editButton" fx:id="editButton" accessibleHelp="Edit" mnemonicParsing="false"
+                 onAction="#showEditMenu" styleClass="iconButton" stylesheets="@styles.css"/>
+         <Button id="solveButton" fx:id="solveButton" accessibleHelp="Solve" mnemonicParsing="false"
+                 onAction="#solveSudoku" styleClass="iconButton" stylesheets="@styles.css"/>
+         <Button id="loadButton" fx:id="loadButton" accessibleHelp="Load" mnemonicParsing="false"
+                 onAction="#showLoadMenu" styleClass="iconButton" stylesheets="@styles.css"/>
+         <Button id="saveButton" fx:id="saveButton" accessibleHelp="Save" mnemonicParsing="false" onAction="#saveGame"
+                 styleClass="iconButton" stylesheets="@styles.css"/>
       </HBox>
    </bottom>
 </BorderPane>

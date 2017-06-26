@@ -1,5 +1,7 @@
 package de.gruppe3.sudoku;
 
+import de.gruppe3.sudoku.backend.Generator;
+import de.gruppe3.sudoku.backend.Solver;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
@@ -27,14 +29,14 @@ import java.util.List;
 
 public class Controller {
 
-    static final String EDIT_DIFFICULTY = "Change Difficulty";
-    static final String EDIT_BG_COLOR = "Edit Background";
-    static final String EDIT_FG_COLOR = "Edit Foreground";
+    private static final String EDIT_DIFFICULTY = "Change Difficulty";
+    private static final String EDIT_BG_COLOR = "Edit Background";
+    private static final String EDIT_FG_COLOR = "Edit Foreground";
 
-    static final Color WRONG_FIELD_COLOR = new Color(0.8902, 0.451, 0.4431, 1);
+    private static final Color WRONG_FIELD_COLOR = new Color(0.8902, 0.451, 0.4431, 1);
 
-    boolean menuOpen = false;
-    int difficulty = 3;
+    private boolean menuOpen = false;
+    private int difficulty = 3;
 
     @FXML
     GridPane sudokuGrid;
@@ -57,21 +59,24 @@ public class Controller {
     @FXML
     Button restartButton;
 
-    ListView<String> editMenu;
-    ListView<ImageView> loadMenu;
+    private ListView<String> editMenu;
+    private ListView<ImageView> loadMenu;
 
-    ColorPicker bgColorPicker;
-    ColorPicker numColorPicker;
+    private ColorPicker bgColorPicker;
+    private ColorPicker numColorPicker;
 
-    Color bgColor = Color.WHEAT;
-    Color fgColor = Color.BLACK;
+    private Color bgColor = Color.WHEAT;
+    private Color fgColor = Color.BLACK;
 
-    Slider difficultySlider;
+    private Slider difficultySlider;
 
     @FXML
     BorderPane contentPane;
 
-    TextField[][] sudokuSquares;
+    private byte[][] empty = new byte[9][9];
+    private byte[][] replayField = empty;
+
+    private TextField[][] sudokuSquares;
     private boolean setup = true;
 
     @FXML
@@ -101,6 +106,27 @@ public class Controller {
                                     (int)(WRONG_FIELD_COLOR.getRed()*255),
                                     (int)(WRONG_FIELD_COLOR.getGreen()*255),
                                     (int)(WRONG_FIELD_COLOR.getBlue()*255))));
+                        } else {
+                            boolean done = true;
+
+                            for (int xc = 0; xc < 9; xc++) {
+                                if (!done) break;
+
+                                for (int yc = 0; yc < 9; yc++) {
+                                    if (!done) break;
+
+                                    if (sudokuSquares[xc][yc].getText().equals("")) {
+                                        done = false;
+                                    }
+                                }
+                            }
+
+                            if(done) {
+                                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                alert.setHeaderText("You did it!");
+                                alert.setContentText("You successfully solved the Sudoku. Play Again!");
+                                alert.showAndWait();
+                            }
                         }
                     }
                 });
@@ -200,10 +226,30 @@ public class Controller {
         loadMenu = new ListView<>();
         loadMenu.setOnMouseClicked(e -> loadGame(loadMenu.getSelectionModel().getSelectedItem()));
 
+        newButton.setOnAction(e -> {
+            setup = true;
+
+            loadArray(empty);
+
+            byte[][] sudoku = Generator.generate(30 + (10 - difficulty) * 3);
+            loadArray(sudoku);
+            replayField = sudoku;
+
+            setup = false;
+        });
+
+        restartButton.setOnAction(e -> {
+            setup = true;
+
+            loadArray(replayField);
+
+            setup = false;
+        });
+
         setup = false;
     }
 
-    public void postInitialize() {
+    void postInitialize() {
         Scene s = Main.scene;
 
         s.getAccelerators().put(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), () -> saveButton.fire());
@@ -245,6 +291,7 @@ public class Controller {
 
         loadMenu.getItems().clear();
 
+        //noinspection ConstantConditions
         for (File img : saveDir.listFiles(File::isFile)) {
             if (img.getName().endsWith(".png")) {
                 try {
@@ -275,10 +322,14 @@ public class Controller {
             alert.setContentText("The sudoku has either no or too many possible solutions!");
             alert.showAndWait();
         } else {
-            for (int x = 0; x < 9; x++) {
-                for (int y = 0; y < 9; y++) {
-                    sudokuSquares[x][y].setText(String.valueOf(solution[x][y]));
-                }
+            loadArray(solution);
+        }
+    }
+
+    private void loadArray(byte[][] sudoku) {
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 9; y++) {
+                sudokuSquares[x][y].setText(String.valueOf(sudoku[x][y]));
             }
         }
     }
@@ -300,7 +351,7 @@ public class Controller {
         return values;
     }
 
-    public void loadGame(ImageView selectedItem) {
+    private void loadGame(ImageView selectedItem) {
         setup = true;
 
         String csvName = "saves/" + selectedItem.getId() + ".csv";
@@ -320,14 +371,19 @@ public class Controller {
             e.printStackTrace();
         }
 
+        byte[][] loaded = new byte[9][9];
+
         for (int line = 0; line < 9; line++) {
             String[] fields = csvLines.get(line).split("[ ]*,[ ]*");
 
             for (int column = 0; column < 9; column++) {
+                loaded[column][line] = Byte.valueOf(fields[column]);
                 sudokuSquares[column][line].setText(fields[column]);
                 if(!fields[column].equals("0")) sudokuSquares[column][line].getStyleClass().add("givenNumber");
             }
         }
+
+        replayField = loaded;
 
         setup = false;
         contentPane.setCenter(sudokuGrid);
@@ -357,7 +413,9 @@ public class Controller {
 
 
         try {
+            //noinspection ResultOfMethodCallIgnored
             csvFile.getParentFile().mkdir();
+            //noinspection ResultOfMethodCallIgnored
             csvFile.createNewFile();
 
             PrintWriter writer = new PrintWriter(csvFile);

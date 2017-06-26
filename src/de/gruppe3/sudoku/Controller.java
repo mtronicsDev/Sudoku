@@ -4,12 +4,14 @@ import de.gruppe3.sudoku.backend.Generator;
 import de.gruppe3.sudoku.backend.Solver;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -224,6 +226,7 @@ public class Controller {
         editMenu.getItems().add(EDIT_DIFFICULTY);
 
         loadMenu = new ListView<>();
+        loadMenu.setPadding(Insets.EMPTY);
         loadMenu.setOnMouseClicked(e -> loadGame(loadMenu.getSelectionModel().getSelectedItem()));
 
         newButton.setOnAction(e -> {
@@ -433,8 +436,10 @@ public class Controller {
         sudokuGrid.snapshot(param -> {
             File jpgFile = new File("saves/" + filename + ".png");
 
+            WritableImage img = param.getImage();
+
             try {
-                ImageIO.write(SwingFXUtils.fromFXImage(param.getImage(), null), "PNG", jpgFile);
+                ImageIO.write(SwingFXUtils.fromFXImage(img, null), "PNG", jpgFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
